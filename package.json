@@ -4,7 +4,8 @@
   "description": "Project by Ganesh and Shubham",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon server.js",
+    "dev": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,22 @@
   "bugs": {
     "url": "https://github.com/attainu/Business-Listing/issues"
   },
-  "homepage": "https://github.com/attainu/Business-Listing#readme"
+  "homepage": "https://github.com/attainu/Business-Listing#readme",
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.6",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.4.6",
+    "randomstring": "^1.1.5",
+    "uniqid": "^5.2.0",
+    "uuid": "^7.0.2"
+  },
+  "devDependencies": {
+    "jest": "^25.1.0",
+    "nodemon": "^2.0.2"
+  }
 }
