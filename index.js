@@ -16,6 +16,7 @@ app.use(express.json());
 
 // Adding Custom Middlewares
 app.use("/users", require(path.join(__dirname, "routes", "users")));
+app.use('/admin', require(path.join(__dirname, 'routes','admin', 'admin')))
 app.use(
   "/verifyEmail",
   require(path.join(__dirname, "routes", "common", "verifyEmail"))
