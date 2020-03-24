@@ -44,26 +44,10 @@ const schema = mongoose.Schema(
       type: Boolean,
       required: true
     },
-    BusinessAddress: [
-      {
-        DNo: {
-          type: String,
-          required: true
-        },
-        Street: {
-          type: String,
-          required: true
-        },
-        City: {
-          type: String,
-          required: true
-        },
-        Pincode: {
-          type: Number,
-          required: true
-        }
-      }
-    ],
+    businessAddress: {
+      type : String,
+      required : true
+    },
     gstinNumber: {
       type: String,
       required: true

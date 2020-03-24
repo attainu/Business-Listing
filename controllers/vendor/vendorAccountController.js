@@ -1,15 +1,14 @@
 // Loading Modules
-const [path, Joi, uniqid, jwt] = [
+const [path, Joi, uniqid,] = [
   require("path"),
   require("@hapi/joi"),
   require("uniqid"),
-  require("jsonwebtoken")
 ];
 const uuid = require("uuid/v4");
 
 // Destructuring Modules
 const { hash, compare } = require("bcryptjs");
-const { sign, verify } = jwt;
+const { sign, verify } = require("jsonwebtoken");
 
 // Importing Mail routes
 const registerMail = require(path.join(
@@ -62,7 +61,7 @@ exports.postRegister = async (req, res, next) => {
         .required()
         .min(3)
         .max(25),
-      businessAddress: Joi.array().required(),
+        businessAddress: Joi.string().required(),
       businessType : Joi.string().min(3).max(25).required()
     });
     const { error, result } = schema.validate({
