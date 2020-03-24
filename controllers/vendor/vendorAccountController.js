@@ -15,12 +15,13 @@ const { sign, verify } = jwt;
 const registerMail = require(path.join(
   __dirname,
   "..",
+  "..",
   "email",
   "registrationMail"
 ));
 
 // Mongoose Schema
-const User = require(path.join(__dirname, "..", "models", "clientAccountDB"));
+const User = require(path.join(__dirname, "..", "..", "models", "vendorAccountDB"));
 
 // Register controllers
 
@@ -33,7 +34,16 @@ exports.getRegister = (req, res, next) => {
 exports.postRegister = async (req, res, next) => {
   try {
     // Storing user Fields in Variables
-    const { username, email, confirmEmail, mobileNumber } = req.body;
+    const {
+      username,
+      email,
+      confirmEmail,
+      mobileNumber,
+      businessName,
+      businessType,
+      businessAddress,
+      gstinNumber
+    } = req.body;
 
     // Validating Fields
     const schema = Joi.object({
@@ -47,13 +57,22 @@ exports.postRegister = async (req, res, next) => {
         tlds: { allow: ["com", "net"] }
       }),
       confirmEmail: Joi.ref("email"),
-      mobileNumber: Joi.number().required()
+      mobileNumber: Joi.number().required(),
+      businessName: Joi.string()
+        .required()
+        .min(3)
+        .max(25),
+      businessAddress: Joi.array().required(),
+      businessType : Joi.string().min(3).max(25).required()
     });
     const { error, result } = schema.validate({
       username: username,
       email: email,
       confirmEmail: confirmEmail,
-      mobileNumber: mobileNumber
+      mobileNumber: mobileNumber,
+      businessName : businessName,
+      businessAddress : businessAddress,
+      businessType : businessType
     });
     if (error) {
       return res.json({ message: error.message });
@@ -71,9 +90,14 @@ exports.postRegister = async (req, res, next) => {
         passwordToken,
         password,
         mobileNumber,
+        businessAddress,
+        businessName,
+        businessType,
         token: token,
         secretToken: secretToken,
-        isVerified: false
+        isVerified: false,
+        isAdminVerified : false,
+        gstinNumber
       });
       await user.save();
       registerMail(email, secretToken);
@@ -105,7 +129,7 @@ exports.postLogin = async (req, res, next) => {
         user.token = await sign({ _id: user._id }, "sriksha", {
           expiresIn: 1000 * 60 * 60
         });
-        console.log(user.token)
+        console.log(user.token);
         await user.save();
         return res.json({ message: `Login Successfull` });
       }
@@ -121,9 +145,9 @@ exports.postLogin = async (req, res, next) => {
 exports.DeleteLogout = async (req, res, next) => {
   try {
     let founduser = req.user;
-    let user = await User.findOne({ email : founduser.email });
-    user.token = ''
-    console.log(user.token)
+    let user = await User.findOne({ email: founduser.email });
+    user.token = "";
+    console.log(user.token);
     await user.save();
     return res.json({ message: "Logged out Successfull" });
   } catch (error) {

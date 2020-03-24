@@ -24,26 +24,59 @@ const emailVerified = require(path.join(
 ));
 
 // Importing Controller Routes
-const userControllers = require(path.join(
+const userclientControllers = require(path.join(
   __dirname,
   "..",
   "controllers",
+  "user",
   "clientAccountController"
 ));
+const userVendorControllers = require(path.join(
+  __dirname,
+  "..",
+  "controllers",
+  "vendor",
+  "vendorAccountController"
+));
+// Client Routes
 
 // Register Routes
 router
   .route("/client/register")
-  .get(userControllers.getRegister)
-  .post(emailexists, userControllers.postRegister);
+  .get(userclientControllers.getRegister)
+  .post(emailexists, userclientControllers.postRegister);
 
+// Login Routes
 router
   .route("/client/login")
-  .get(userControllers.getLogin)
-  .post(emailVerified, userControllers.postLogin);
+  .get(userclientControllers.getLogin)
+  .post(emailVerified, userclientControllers.postLogin);
 
+// Logout Routes
 router
   .route("/client/logout")
-  .delete(Authorized, userControllers.DeleteLogout);
+  .delete(Authorized, userclientControllers.DeleteLogout);
 
+
+
+// Vendor Routes
+
+// Register Routes
+router
+  .route("/vendor/register")
+  .get(userVendorControllers.getRegister)
+  .post(emailexists, userVendorControllers.postRegister);
+
+// Login Routes
+router
+  .route("/vendor/login")
+  .get(userVendorControllers.getLogin)
+  .post(emailVerified, userVendorControllers.postLogin);
+
+// Logout Routes
+router
+  .route("/vendor/logout")
+  .delete(Authorized, userVendorControllers.DeleteLogout);
+
+// Exporting router module
 module.exports = router;

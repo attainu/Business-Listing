@@ -1,11 +1,13 @@
 const path = require("path");
-const User = require(path.join(__dirname, "..", "models", "clientAccountDB"));
+const User = require(path.join(__dirname, "..","..", "models", "clientAccountDB"));
 
 // Importing Mail routes
 const passwordSent = require(path.join(
   __dirname,
   "..",
+  "..",
   "email",
+  "client",
   "passwordSent"
 ));
 

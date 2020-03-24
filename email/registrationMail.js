@@ -16,8 +16,6 @@ module.exports = async (email, secretToken) => {
       from: EMAIL,
       to: email,
       subject: "Account Verification",
-      text:
-        "Hi welcome to Sriksha Event Management Services, click on the link below to activate your account.",
       html: `<h3><a href='http://localhost:${PORT}/verifyEmail/${secretToken}'>${secretToken}</a></h3>`
     };
     await transporter.sendMail(mailOptions);
