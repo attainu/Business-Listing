@@ -1,8 +1,8 @@
 // Loading Modules
-const [path, Joi, uniqid,] = [
+const [path, Joi, uniqid] = [
   require("path"),
   require("@hapi/joi"),
-  require("uniqid"),
+  require("uniqid")
 ];
 const uuid = require("uuid/v4");
 
@@ -20,7 +20,13 @@ const registerMail = require(path.join(
 ));
 
 // Mongoose Schema
-const User = require(path.join(__dirname, "..", "..", "models", "vendorAccountDB"));
+const User = require(path.join(
+  __dirname,
+  "..",
+  "..",
+  "models",
+  "adminAccountDB"
+));
 
 // Register controllers
 
@@ -33,16 +39,7 @@ exports.getRegister = (req, res, next) => {
 exports.postRegister = async (req, res, next) => {
   try {
     // Storing user Fields in Variables
-    const {
-      username,
-      email,
-      confirmEmail,
-      mobileNumber,
-      businessName,
-      businessType,
-      businessAddress,
-      gstinNumber
-    } = req.body;
+    const { username, email, password } = req.body;
 
     // Validating Fields
     const schema = Joi.object({
@@ -55,52 +52,29 @@ exports.postRegister = async (req, res, next) => {
         minDomainSegments: 2,
         tlds: { allow: ["com", "net"] }
       }),
-      confirmEmail: Joi.ref("email"),
-      mobileNumber: Joi.number().required(),
-      businessName: Joi.string()
+      password: Joi.string()
         .required()
         .min(3)
-        .max(25),
-        businessAddress: Joi.string().required(),
-      businessType : Joi.string().min(3).max(25).required()
+        .max(25)
     });
     const { error, result } = schema.validate({
       username: username,
       email: email,
-      confirmEmail: confirmEmail,
-      mobileNumber: mobileNumber,
-      businessName : businessName,
-      businessAddress : businessAddress,
-      businessType : businessType
+      password: password
     });
     if (error) {
       return res.json({ message: error.message });
     } else {
-      const secretToken = uuid();
-      const passwordid = uniqid();
-      const passwordToken = passwordid;
-      const password = await hash(passwordid, 10);
+      const hashed = await hash(password, 10);
       const token = await sign({ id: uuid() }, "sriksha", {
         expiresIn: 1000 * 60 * 60
       });
       const user = new User({
         username,
         email,
-        passwordToken,
-        password,
-        mobileNumber,
-        businessAddress,
-        businessName,
-        businessType,
-        token: token,
-        secretToken: secretToken,
-        isVerified: false,
-        isAdminVerified : false,
-        gstinNumber
+        password: hashed
       });
       await user.save();
-      registerMail(email, secretToken);
-      // registerMail(email, secretToken)
       res.json({ message: "Registered Successfully" });
     }
   } catch (error) {
@@ -153,4 +127,3 @@ exports.DeleteLogout = async (req, res, next) => {
     next(error);
   }
 };
-

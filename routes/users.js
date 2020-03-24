@@ -1,15 +1,13 @@
 // Initializing Express Router
 const [router, path] = [require("express").Router(), require("path")];
 
-// Import Email Exists route
+// Importing Middlewares
 const emailexists = require(path.join(
   __dirname,
   "..",
   "middlewares",
   "emailExists"
 ));
-
-//
 const Authorized = require(path.join(
   __dirname,
   "..",
@@ -21,6 +19,12 @@ const emailVerified = require(path.join(
   "..",
   "middlewares",
   "emailVerified"
+));
+const adminVerified = require(path.join(
+  __dirname,
+  "..",
+  "middlewares",
+  "adminVerified"
 ));
 
 // Importing Controller Routes
@@ -57,8 +61,6 @@ router
   .route("/client/logout")
   .delete(Authorized, userclientControllers.DeleteLogout);
 
-
-
 // Vendor Routes
 
 // Register Routes
@@ -71,7 +73,7 @@ router
 router
   .route("/vendor/login")
   .get(userVendorControllers.getLogin)
-  .post(emailVerified, userVendorControllers.postLogin);
+  .post(emailVerified, adminVerified, userVendorControllers.postLogin);
 
 // Logout Routes
 router
