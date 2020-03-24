@@ -1,0 +1,20 @@
+{
+  "name": "Business-Listing",
+  "version": "1.0.0",
+  "description": "Project by Ganesh and Shubham",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/attainu/Business-Listing.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/attainu/Business-Listing/issues"
+  },
+  "homepage": "https://github.com/attainu/Business-Listing#readme"
+}
