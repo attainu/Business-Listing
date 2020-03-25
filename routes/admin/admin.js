@@ -52,5 +52,8 @@ router
 // Get Single Activation List
 router.route("/activate/:id").get(adminActivations.getSingleRequest);
 
+// Delete Activation Request
+router.route('/activate/:id').delete(adminActivations.deleteSingleRequest);
+
 // Exporting router module
 module.exports = router;

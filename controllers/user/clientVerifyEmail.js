@@ -7,7 +7,6 @@ const passwordSent = require(path.join(
   "..",
   "..",
   "email",
-  "client",
   "passwordSent"
 ));
 

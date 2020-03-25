@@ -78,7 +78,6 @@ exports.postRegister = async (req, res, next) => {
       });
       await user.save();
       registerMail(email, secretToken);
-      // registerMail(email, secretToken)
       res.json({ message: "Registered Successfully" });
     }
   } catch (error) {
