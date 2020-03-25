@@ -44,8 +44,8 @@ const schema = mongoose.Schema(
       type: Boolean,
       required: true
     },
-    businessAddress: {
-      type : String,
+    Address: {
+      type : Object,
       required : true
     },
     gstinNumber: {

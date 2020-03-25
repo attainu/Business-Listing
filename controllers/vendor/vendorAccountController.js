@@ -40,7 +40,10 @@ exports.postRegister = async (req, res, next) => {
       mobileNumber,
       businessName,
       businessType,
-      businessAddress,
+      dNo,
+      area,
+      city,
+      pinCode,
       gstinNumber
     } = req.body;
 
@@ -61,7 +64,10 @@ exports.postRegister = async (req, res, next) => {
         .required()
         .min(3)
         .max(25),
-        businessAddress: Joi.string().required(),
+        dNo: Joi.string().required(),
+        area: Joi.string().required(),
+        city: Joi.string().required(),
+        pinCode: Joi.string().required(),
       businessType : Joi.string().min(3).max(25).required()
     });
     const { error, result } = schema.validate({
@@ -70,7 +76,10 @@ exports.postRegister = async (req, res, next) => {
       confirmEmail: confirmEmail,
       mobileNumber: mobileNumber,
       businessName : businessName,
-      businessAddress : businessAddress,
+      dNo : dNo,
+      area : area,
+      city : city,
+      pinCode : pinCode,
       businessType : businessType
     });
     if (error) {
@@ -89,7 +98,12 @@ exports.postRegister = async (req, res, next) => {
         passwordToken,
         password,
         mobileNumber,
-        businessAddress,
+        Address : {
+          dNo : dNo,
+          area : area,
+          city : city,
+          pinCode : pinCode
+        },
         businessName,
         businessType,
         token: token,

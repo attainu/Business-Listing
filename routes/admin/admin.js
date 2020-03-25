@@ -30,18 +30,18 @@ const adminActivations = require(path.join(
 
 // Register Routes
 router
-  .route("/auth")
+  .route("/auth/register")
   .get(adminControllers.getRegister)
   .post(adminControllers.postRegister);
 
 // Login Routes
 router
-  .route("/auth")
+  .route("/auth/login")
   .get(adminControllers.getLogin)
   .post(adminControllers.postLogin);
 
 // Logout Routes
-router.route("/auth").delete(Authorized, adminControllers.DeleteLogout);
+router.route("/auth/logout").delete(Authorized, adminControllers.DeleteLogout);
 
 // Get All Activation list
 router

@@ -39,7 +39,7 @@ exports.getRegister = (req, res, next) => {
 exports.postRegister = async (req, res, next) => {
   try {
     // Storing user Fields in Variables
-    const { username, email, password } = req.body;
+    const { username, email, password, mobileNumber } = req.body;
 
     // Validating Fields
     const schema = Joi.object({
@@ -55,12 +55,14 @@ exports.postRegister = async (req, res, next) => {
       password: Joi.string()
         .required()
         .min(3)
-        .max(25)
+        .max(25),
+        mobileNumber : Joi.string().required().min(10)
     });
     const { error, result } = schema.validate({
-      username: username,
-      email: email,
-      password: password
+      username,
+      email,
+      password,
+      mobileNumber,
     });
     if (error) {
       return res.json({ message: error.message });
@@ -73,6 +75,7 @@ exports.postRegister = async (req, res, next) => {
         username,
         email,
         token,
+        mobileNumber,
         password: hashed
       });
       await user.save();

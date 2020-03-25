@@ -67,7 +67,7 @@ router
 router
   .route("/vendor/register")
   .get(userVendorControllers.getRegister)
-  .post(userVendorControllers.postRegister);
+  .post(emailexists, userVendorControllers.postRegister);
 
 // Login Routes
 router
