@@ -14,6 +14,17 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Fixing cors errors problems
+app.use((req, res,next)=>{
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+  if(req.method === 'Options'){
+    res.header('Access-Control-Allow-Methods', 'GET, PUT, PATCH, DELETE, POST')
+    return res.status(200).json({})
+  }
+  next()
+})
+
 // Adding Custom Middlewares
 app.use("/users", require(path.join(__dirname, "routes", "users")));
 app.use('/admin', require(path.join(__dirname, 'routes','admin', 'admin')))
