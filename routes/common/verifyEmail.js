@@ -1,6 +1,8 @@
 const [router, path] = [require('express').Router(), require('path')]
-const emailVerifyController = require(path.join(__dirname, '..','..', 'controllers','user', 'clientVerifyEmail'));
 
-router.route('/:token').get(emailVerifyController.verifyEmail)
+const EmailVerifyController = require(path.join(__dirname, '..','..', 'controllers','common', 'emailVerify'));
+
+
+router.route('/client/:token').get(EmailVerifyController.verifyEmail)
 
 module.exports = router

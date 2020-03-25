@@ -18,7 +18,7 @@ const registerMail = require(path.join(
   "..",
   "..",
   "email",
-  "registrationMail"
+  "registrationMailClient"
 ));
 
 // Mongoose Schema

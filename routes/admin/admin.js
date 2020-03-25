@@ -25,23 +25,37 @@ const adminActivations = require(path.join(
   "..",
   "controllers",
   "admin",
-  "adminActivationsController"
+  "adminCrudController"
+));
+const emailexists = require(path.join(
+  __dirname,
+  "..",
+  "..",
+  "middlewares",
+  "emailExists"
+));
+const emailVerified = require(path.join(
+  __dirname,
+  "..",
+  '..',
+  "middlewares",
+  "emailVerified"
 ));
 
 // Register Routes
 router
-  .route("/auth/register")
+  .route("/register")
   .get(adminControllers.getRegister)
-  .post(adminControllers.postRegister);
+  .post(emailexists, adminControllers.postRegister);
 
 // Login Routes
 router
-  .route("/auth/login")
+  .route("/login")
   .get(adminControllers.getLogin)
-  .post(adminControllers.postLogin);
+  .post(emailVerified, adminControllers.postLogin);
 
 // Logout Routes
-router.route("/auth/logout").delete(Authorized, adminControllers.DeleteLogout);
+router.route("/logout").delete(Authorized, adminControllers.DeleteLogout);
 
 // Get All Activation list
 router

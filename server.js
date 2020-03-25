@@ -9,11 +9,11 @@ const [mongoose, path, dotenv] = [
 const app = require(path.join(__dirname, "index"));
 
 // Environment Variables
-const { PORT, MONGODB_URI, MONGODB_PASS } = process.env;
+const { PORT, MONGODB_URI,MONGO_LOCAL, MONGODB_PASS } = process.env;
 
 // Mongoose Connection
 mongoose
-  .connect(MONGODB_URI.replace("<password>", MONGODB_PASS), {
+  .connect(MONGO_LOCAL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex : true

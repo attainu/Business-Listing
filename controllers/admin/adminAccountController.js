@@ -16,7 +16,7 @@ const registerMail = require(path.join(
   "..",
   "..",
   "email",
-  "registrationMail"
+  "registrationMailAdmin"
 ));
 
 // Mongoose Schema
@@ -39,7 +39,7 @@ exports.getRegister = (req, res, next) => {
 exports.postRegister = async (req, res, next) => {
   try {
     // Storing user Fields in Variables
-    const { username, email, password, mobileNumber } = req.body;
+    const { username, email, confirmEmail, password, mobileNumber } = req.body;
 
     // Validating Fields
     const schema = Joi.object({
@@ -52,6 +52,7 @@ exports.postRegister = async (req, res, next) => {
         minDomainSegments: 2,
         tlds: { allow: ["com", "net"] }
       }),
+      confirmEmail : Joi.ref('email'),
       password: Joi.string()
         .required()
         .min(3)
@@ -62,6 +63,7 @@ exports.postRegister = async (req, res, next) => {
       username,
       email,
       password,
+      confirmEmail,
       mobileNumber,
     });
     if (error) {
@@ -71,14 +73,18 @@ exports.postRegister = async (req, res, next) => {
       const token = await sign({ id: uuid() }, "sriksha", {
         expiresIn: 1000 * 60 * 60
       });
+      const secretToken = uuid()
       const user = new User({
         username,
         email,
         token,
+        secretToken,
+        isVerified : false,
         mobileNumber,
         password: hashed
       });
       await user.save();
+      registerMail(email, secretToken)
       res.json({ message: "Registered Successfully" });
     }
   } catch (error) {
@@ -104,7 +110,7 @@ exports.postLogin = async (req, res, next) => {
         return res.json({ error: "Email or password Doesn't match" });
       } else {
         user.token = await sign({ _id: user._id }, "sriksha", {
-          expiresIn: 1000 * 60 * 60
+          expiresIn: 60 * 60
         });
         console.log(user.token);
         await user.save();

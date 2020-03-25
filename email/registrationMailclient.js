@@ -16,7 +16,7 @@ module.exports = async (email, secretToken) => {
       from: EMAIL,
       to: email,
       subject: "Account Verification",
-      html: `<h3><a href='http://localhost:${PORT}/verifyEmail/${secretToken}'>${secretToken}</a></h3>`
+      html: `<h3><a href='http://localhost:${PORT}/verifyEmail/client/${secretToken}'>${secretToken}</a></h3>`
     };
     await transporter.sendMail(mailOptions);
   } catch (error) {
