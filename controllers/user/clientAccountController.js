@@ -1,9 +1,10 @@
 // Loading Modules
-const [path, Joi, uniqid, jwt] = [
+const [path, Joi, uniqid, jwt, stringSimilarity] = [
   require("path"),
   require("@hapi/joi"),
   require("uniqid"),
-  require("jsonwebtoken")
+  require("jsonwebtoken"),
+  require('string-similarity')
 ];
 const uuid = require("uuid/v4");
 
@@ -120,11 +121,10 @@ exports.postLogin = async (req, res, next) => {
 // Logout Route
 exports.DeleteLogout = async (req, res, next) => {
   try {
-    let founduser = req.user;
-    let user = await User.findOne({ email : founduser.email });
-    user.token = ''
-    console.log(user.token)
-    await user.save();
+    const user = req.user;
+    let token = await User.findOne({ token : user.token });
+    token.token = "";
+    await token.save();
     return res.json({ message: "Logged out Successfull" });
   } catch (error) {
     next(error);

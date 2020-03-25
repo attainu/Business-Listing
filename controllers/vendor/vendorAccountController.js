@@ -126,7 +126,7 @@ exports.postLogin = async (req, res, next) => {
         return res.json({ error: "Email or password Doesn't match" });
       } else {
         user.token = await sign({ _id: user._id }, "sriksha", {
-          expiresIn: 1000 * 60 * 60
+          expiresIn: 60 * 60
         });
         console.log(user.token);
         await user.save();
@@ -143,11 +143,10 @@ exports.postLogin = async (req, res, next) => {
 // Logout Route
 exports.DeleteLogout = async (req, res, next) => {
   try {
-    let founduser = req.user;
-    let user = await User.findOne({ email: founduser.email });
-    user.token = "";
-    console.log(user.token);
-    await user.save();
+    const user = req.user;
+    let token = await User.findOne({ token : user.token });
+    token.token = "";
+    await token.save();
     return res.json({ message: "Logged out Successfull" });
   } catch (error) {
     next(error);

@@ -72,6 +72,7 @@ exports.postRegister = async (req, res, next) => {
       const user = new User({
         username,
         email,
+        token,
         password: hashed
       });
       await user.save();
@@ -117,11 +118,10 @@ exports.postLogin = async (req, res, next) => {
 // Logout Route
 exports.DeleteLogout = async (req, res, next) => {
   try {
-    let founduser = req.user;
-    let user = await User.findOne({ email: founduser.email });
-    user.token = "";
-    console.log(user.token);
-    await user.save();
+    const user = req.user;
+    let token = await User.findOne({ token : user.token });
+    token.token = "";
+    await token.save();
     return res.json({ message: "Logged out Successfull" });
   } catch (error) {
     next(error);
