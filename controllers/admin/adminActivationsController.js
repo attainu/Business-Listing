@@ -12,7 +12,6 @@ const vendordb = require(path.join(
 // Fetching all activation requests
 exports.getRequests = async (req, res, next) => {
   let user = await vendordb.find();
-  // if(!user) return res.json({error : 'No Requests'})
   user.forEach(vendor => {
     if (vendor.isAdminVerified === false) {
       return res.json({
