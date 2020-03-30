@@ -21,6 +21,6 @@ mongoose
   .then(() => {
     console.log("DB Connected Successfully!!!");
     // Listening Port
-    app.listen(PORT, () => console.log(`Server Connected At Port ${PORT}`));
+    app.listen(PORT, () => console.log(`Server Connected At Port ${PORT} in ${process.env.NODE_ENV} environment`));
   })
   .catch(err => console.log(err));

@@ -1,9 +1,7 @@
 const path = require("path");
 
 // Mongoose collections paths
-const User = require(path.join(__dirname, "..", "models", "clientAccountDB"));
-const Vendor = require(path.join(__dirname, "..", "models", "vendorAccountDB"));
-const Admin = require(path.join(__dirname, "..", "models", "adminAccountDB"));
+const User = require(path.join(__dirname, '..', 'models', 'Users'))
 
 module.exports = async (req, res, next) => {
   const {email} = req.body

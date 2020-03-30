@@ -1,6 +1,6 @@
 const path = require('path')
 
-const User = require(path.join(__dirname, '..', 'models', 'vendorAccountDB'))
+const User = require(path.join(__dirname, '..', 'models', 'Users'))
 
 module.exports = async (req, res, next) => {
     const user = await User.find({email : req.body.email})

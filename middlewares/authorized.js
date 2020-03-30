@@ -1,9 +1,7 @@
 const [path, jwt] = [require("path"), require("jsonwebtoken")];
 
 // Mongoose collections paths
-const User = require(path.join(__dirname, "..", "models", "clientAccountDB"));
-const Vendor = require(path.join(__dirname, "..", "models", "vendorAccountDB"));
-const Admin = require(path.join(__dirname, "..", "models", "adminAccountDB"));
+const User = require(path.join(__dirname, '..', 'models', 'Users'))
 
 module.exports = async (req, res, next) => {
   let authToken = req.header("Authorization");
