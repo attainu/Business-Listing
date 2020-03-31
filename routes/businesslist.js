@@ -3,6 +3,12 @@ const [router, path, multer] = [
   require("path"),
   require("multer")
 ];
+const { authorized,roleauthor } = require(path.join(
+  __dirname,
+  "..",
+  "middlewares",
+  "authorized"
+));
 
 const upload = require(path.join(__dirname, "..", "multerSingle"));
 const uploadArray = require(path.join(__dirname, "..", "multerArray"));
@@ -26,17 +32,20 @@ router.use("/:id/services", require(path.join(__dirname, "services")));
 router
   .route("/")
   .get(getBusinessLists)
-  .post(createBusinessList);
+  .post(authorized, roleauthor('admin', 'vendor'), createBusinessList);
 
 router
   .route("/:id")
   .get(getBusinessListByID)
-  .put(updateBusinessListByID)
-  .delete(deleteBusinessListByID);
+  .put(authorized, roleauthor('admin', 'vendor'), updateBusinessListByID)
+  .delete(authorized, roleauthor('admin', 'vendor'), deleteBusinessListByID);
 
-router.route("/image_banner/:id").put(upload, bannerImage);
+router.route("/image_banner/:id").put(authorized,roleauthor('admin', 'vendor'), upload, bannerImage);
 
-router.route("/image_collections/:id").put(uploadArray, imageCollections).delete(deleteGallery);
+router
+  .route("/image_collections/:id")
+  .put(authorized, roleauthor('admin', 'vendor'), uploadArray, imageCollections)
+  .delete(authorized, roleauthor('admin', 'vendor'), deleteGallery);
 
 // router.route("image_collections/:id").put(uploadArray, imageCollections);
 

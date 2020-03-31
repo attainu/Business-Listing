@@ -101,7 +101,12 @@ const businessSchema = new mongoose.Schema(
     },keywords : {
         type : [String],
         default : ''
-    },slug : String
+    },slug : String,
+    user : {
+      type : mongoose.Types.ObjectId,
+      ref : 'User',
+      required : true
+    }
   },{
     toJSON : {virtuals : true},
     toObject : {virtuals : true}

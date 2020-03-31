@@ -9,17 +9,24 @@ const {
   deleteCourse
 } = require(path.join(__dirname, "..", "controllers", "services"));
 
+const {authorized,roleauthor} = require(path.join(
+  __dirname,
+  "..",
+  "middlewares",
+  "authorized"
+));
+
 // routes
 router
   .route("/")
   .get(getServicesList)
-  .post(createNewService);
+  .post(authorized, roleauthor('admin', 'vendor'), createNewService);
 
 router
   .route("/:id")
   .get(getSingleService)
-  .put(updateCourse)
-  .delete(deleteCourse);
+  .put(authorized, roleauthor('admin', 'vendor'), updateCourse)
+  .delete(authorized, roleauthor('admin', 'vendor'), deleteCourse);
 
 
 // router

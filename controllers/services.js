@@ -51,12 +51,22 @@ exports.getSingleService = async(async (req, res, next) => {
 });
 
 exports.createNewService = async(async (req, res, next) => {
+  req.body.user = req.user.id
   req.body.businesslists = req.params.id;
   const business = await Businesslists.findById(req.params.id);
   if (!business) {
     return res.status(400).json({
       success: false,
       error: `NO resource found with the requested id ${req.params.id}`
+    });
+  }
+  if (
+    business.user.toString() !== req.user.id &&
+    req.user.role !== "admin"
+  ) {
+    return res.status(403).json({
+      success: false,
+      error: `Requested user ${req.user.id} is not authorized to perform this action`
     });
   }
   const service = await Services.create(req.body);
@@ -69,6 +79,15 @@ exports.updateCourse = async(async (req, res, next) => {
     return res.status(400).json({
       success: false,
       error: `NO resource found with the requested id ${req.params.id}`
+    });
+  }
+  if (
+    service.user.toString() !== req.user.id &&
+    req.user.role !== "admin"
+  ) {
+    return res.status(403).json({
+      success: false,
+      error: `Requested user ${req.user.id} is not authorized to perform this action`
     });
   }
   service = await Services.findByIdAndUpdate(req.params.id, req.body, {
@@ -84,6 +103,15 @@ exports.deleteCourse = async(async (req, res, next) => {
     return res.status(400).json({
       success: false,
       error: `NO resource found with the requested id ${req.params.id}`
+    });
+  }
+  if (
+    service.user.toString() !== req.user.id &&
+    req.user.role !== "admin"
+  ) {
+    return res.status(403).json({
+      success: false,
+      error: `Requested user ${req.user.id} is not authorized to perform this action`
     });
   }
   await Services.remove()

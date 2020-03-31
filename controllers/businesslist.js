@@ -7,8 +7,9 @@ const [path, Joi, multer, cloudinary] = [
 ];
 
 // Middlewares/custom files import
-const [BusinessList, async, uploadSingle, uploadArray] = [
+const [BusinessList, User, async, uploadSingle, uploadArray] = [
   require(path.join(__dirname, "..", "models", "BusinessLists")),
+  require(path.join(__dirname, "..", "models", "Users")),
   require(path.join(
     __dirname,
     "..",
@@ -89,6 +90,7 @@ exports.getBusinessListByID = async(async (req, res, next) => {
 
 // Create a business
 exports.createBusinessList = async(async (req, res, next) => {
+  const user = req.user.id;
   // declaring variables
   const {
     name,
@@ -170,7 +172,16 @@ exports.createBusinessList = async(async (req, res, next) => {
   if (error) {
     return res.status(400).json({ success: false, error: error.message });
   } else {
+    const existeduser = await BusinessList.findOne({ user: req.user.id });
+    // console.log(existeduser)
+    if (existeduser && req.user.role !== "admin") {
+      return res.status(406).json({
+        success: false,
+        error: `You're not authorized to create another business, Please contact admin for further details`
+      });
+    }
     const data = new BusinessList({
+      user,
       name,
       category,
       price,
@@ -194,17 +205,27 @@ exports.createBusinessList = async(async (req, res, next) => {
 
 // update business by id
 exports.updateBusinessListByID = async(async (req, res, next) => {
-  const businesslist = await BusinessList.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    { new: true, runvalidators: true }
-  );
+  let businesslist = await BusinessList.findById(req.params.id);
+  console.log(req.user.id);
   if (!businesslist) {
     return res.status(400).json({
       success: false,
       error: `No valid resource found with requested id ${req.params.id}`
     });
   }
+  if (
+    businesslist.user.toString() !== req.user.id &&
+    req.user.role !== "admin"
+  ) {
+    return res.status(403).json({
+      success: false,
+      error: `Requested user ${req.user.id} is not authorized to perform this action`
+    });
+  }
+  businesslist = await BusinessList.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runvalidators: true
+  });
   res.status(201).json({ success: true, data: businesslist });
 });
 
@@ -222,6 +243,15 @@ exports.bannerImage = async(async (req, res, next) => {
       error: `No valid resource found with requested id ${req.params.id}`
     });
   } else {
+    if (
+      businesslist.user.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({
+        success: false,
+        error: `Requested user ${req.user.id} is not authorized to perform this action`
+      });
+    }
     const imagedata = await cloudinary.v2.uploader.upload(req.file.path);
     const successdata = await BusinessList.findByIdAndUpdate(
       req.params.id,
@@ -234,9 +264,9 @@ exports.bannerImage = async(async (req, res, next) => {
 
 // Updating Image Collections
 exports.imageCollections = async(async (req, res, next) => {
-  let arr = req.files
-  for (let elem of arr){
-    console.log(elem.path)
+  let arr = req.files;
+  for (let elem of arr) {
+    console.log(elem.path);
   }
   // uploadArray(req, res, err => {
   //   if (err) {
@@ -250,6 +280,15 @@ exports.imageCollections = async(async (req, res, next) => {
       error: `No valid resource found with requested id ${req.params.id}`
     });
   } else {
+    if (
+      businesslist.user.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({
+        success: false,
+        error: `Requested user ${req.user.id} is not authorized to perform this action`
+      });
+    }
     if (businesslist.gallery.length === 6) {
       return res.status(406).json({
         success: false,
@@ -257,7 +296,7 @@ exports.imageCollections = async(async (req, res, next) => {
       });
     } else {
       const imagedata = await cloudinary.v2.uploader.upload(arr);
-      console.log(imagedata)
+      console.log(imagedata);
       // const successdata = await BusinessList.findByIdAndUpdate(
       //   req.params.id,
       //   { $set: { gallery: imagedata.secure_url } },
@@ -277,6 +316,15 @@ exports.deleteGallery = async(async (req, res, next) => {
       error: `No valid resource found with requested id ${req.params.id}`
     });
   } else {
+    if (
+      businessid.user.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({
+        success: false,
+        error: `Requested user ${req.user.id} is not authorized to perform this action`
+      });
+    }
     let data = businessid.gallery;
     let query = req.query;
     let arr = query.gallery.split(",");
@@ -299,8 +347,10 @@ exports.deleteGallery = async(async (req, res, next) => {
       return diff;
     }
     console.log(arr_diff(data, arr));
-    let updated = await BusinessList.findByIdAndUpdate(req.params.id, {$set : {gallery : arr_diff(data, arr)}})
-          res.status(201).json({success : true, data : updated})
+    let updated = await BusinessList.findByIdAndUpdate(req.params.id, {
+      $set: { gallery: arr_diff(data, arr) }
+    });
+    res.status(201).json({ success: true, data: updated });
   }
 });
 
@@ -311,6 +361,15 @@ exports.deleteBusinessListByID = async(async (req, res, next) => {
     return res.status(400).json({
       success: false,
       error: `No valid response for id ${req.params.id}`
+    });
+  }
+  if (
+    businesslist.user.toString() !== req.user.id &&
+    req.user.role !== "admin"
+  ) {
+    return res.status(403).json({
+      success: false,
+      error: `Requested user ${req.user.id} is not authorized to perform this action`
     });
   }
   businesslist.remove();

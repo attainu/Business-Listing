@@ -1,11 +1,12 @@
 // Requiring NPM Modules
-const [express, path, fs, dotenv, mongoose, morgan] = [
+const [express, path, fs, dotenv, mongoose, morgan, cookieParser] = [
   require("express"),
   require("path"),
   require("fs"),
   require("dotenv").config(),
   require("mongoose"),
-  require("morgan")
+  require("morgan"),
+  require('cookie-parser')
 ];
 
 // Initializing App variable
@@ -15,6 +16,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan("dev"));
+app.use(cookieParser())
 
 // Fixing cors errors problems
 app.use((req, res, next) => {
@@ -40,6 +42,10 @@ app.use(
   require(path.join(__dirname, "routes", "services"))
 );
 app.use("/api/v1/users", require(path.join(__dirname, "routes", "users")));
+app.use(
+  "/api/v1/users/verify_email",
+  require(path.join(__dirname, "routes", "verifyEmail"))
+);
 // app.use('/', require(path.join(__dirname, 'routes', 'index')))
 
 // Error Handling
