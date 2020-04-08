@@ -10,15 +10,6 @@ const [Services, Businesslists, async] = [
 
 // Fetch all services
 exports.getServicesList = async(async (req, res, next) => {
-  // let service
-  // const businessId = req.params.businessid
-  // if(businessId){
-  //     service = Services.find({businesslist : businessId})
-  // }else{
-  //     service = Services.find()
-  // }
-  // await service
-  // res.status(200).json({ success : true, count : service.length, data : service})
   let service = await Services.find().populate("businesslists");
   if (service.length < 1) {
     return res.status(404).json({ success: false, data: [] });

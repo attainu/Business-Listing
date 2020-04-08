@@ -45,6 +45,9 @@ const schema = mongoose.Schema(
       default : false
     },resetPasswordExpire : {
       type : String
+    },block : {
+      type : Boolean,
+      default : true
     }
   },
   {

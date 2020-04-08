@@ -1,21 +1,21 @@
-const [mongoose, slugify] = [require("mongoose"), require('slugify')];
+const [mongoose, slugify] = [require("mongoose"), require("slugify")];
 
 const businessSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: [true, `Business Name can't be empty`],
-      trim: true
+      trim: true,
     },
     address: {
       type: Object,
-      required: [true, `Address can't be empty`]
+      required: [true, `Address can't be empty`],
     },
     rating: {
       type: [Number],
       min: [1, `Minimum rating should be 1`],
       max: [5, `Maximum rating should be 5`],
-      default: 0
+      default: 0,
     },
     category: {
       type: String,
@@ -43,12 +43,12 @@ const businessSchema = new mongoose.Schema(
         "Wedding Cards",
         "Sound System On Hire",
         "Grand Entries",
-        "Bridal Makeup"
-      ]
+        "Bridal Makeup",
+      ],
     },
     banner: {
       type: String,
-      default: "banner-image.jpg"
+      default: "banner-image.jpg",
     },
     gallery: {
       type: [String],
@@ -58,79 +58,94 @@ const businessSchema = new mongoose.Schema(
         "gallery-3.jpg",
         "gallery-4.jpg",
         "gallery-5.jpg",
-        "gallery-6.jpg"
-      ]
+        "gallery-6.jpg",
+      ],
     },
     profilePic: {
       type: String,
-      default: "profilepic.jpg"
+      default: "profilepic.jpg",
     },
     price: {
       type: String,
-      required: true
+      required: true,
     },
     primaryContact: {
       type: Number,
       min: [10, `Enter a valid mobile number`],
-      required: true
+      required: true,
     },
     Telephone: {
       type: Number,
       min: [10, `Enter a valid mobile number`],
       max: [13, `Enter a valid mobile number`],
-      default: null
+      default: null,
     },
     website: {
       type: String,
       match: [
         /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/,
-        `Enter valid url with http/https`
-      ],default : ''
-    },facebookurl : {
-        type : String,
-        default : null
-    },instagramurl : {
-        type : String,
-        default : null
-    },youtubeurl : {
-        type : String,
-        default : null
-    },email : {
-        type : String,
-        required : [true, `Email can't be empty`]
-    },keywords : {
-        type : [String],
-        default : ''
-    },slug : String,
-    user : {
-      type : mongoose.Types.ObjectId,
-      ref : 'User',
-      required : true
-    }
-  },{
-    toJSON : {virtuals : true},
-    toObject : {virtuals : true}
+        `Enter valid url with http/https`,
+      ],
+      default: "",
+    },
+    facebookurl: {
+      type: String,
+      default: null,
+    },
+    instagramurl: {
+      type: String,
+      default: null,
+    },
+    youtubeurl: {
+      type: String,
+      default: null,
+    },
+    email: {
+      type: String,
+      required: [true, `Email can't be empty`],
+    },
+    keywords: {
+      type: [String],
+      default: "",
+    },
+    slug: String,
+    isAdminVerified: {
+      type: Boolean,
+      default: false,
+    },
+    user: {
+      type: mongoose.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },block : {
+      type : Boolean,
+      default : true
+    },
   },
   {
-    timestamps: true
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
+  {
+    timestamps: true,
   }
 );
 
-businessSchema.pre('save', function(next){
-  this.slug = slugify(this.name, {lower : true})
-  next()
-})
+businessSchema.pre("save", function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
 
-businessSchema.pre('remove', async function(next){
-  await this.model('Service').deleteMany({businesslists : this._id})
-  next()
-})
+businessSchema.pre("remove", async function (next) {
+  await this.model("Service").deleteMany({ businesslists: this._id });
+  next();
+});
 
-businessSchema.virtual('services',{
-  ref : 'Service',
-  localField : '_id',
-  foreignField : 'businesslists',
-  justOne : false
-})
+businessSchema.virtual("services", {
+  ref: "Service",
+  localField: "_id",
+  foreignField: "businesslists",
+  justOne: false,
+});
 
-module.exports = mongoose.model('Businesslist', businessSchema)
+module.exports = mongoose.model("Businesslist", businessSchema);

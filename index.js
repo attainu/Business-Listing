@@ -35,7 +35,7 @@ app.use((req, res, next) => {
 // Adding Custom Middlewares
 app.use(
   "/api/v1/business/",
-  require(path.join(__dirname, "routes", "businesslist"))
+  require(path.join(__dirname, "routes", "vendors"))
 );
 app.use(
   "/api/v1/services",
@@ -46,6 +46,7 @@ app.use(
   "/api/v1/users/verify_email",
   require(path.join(__dirname, "routes", "verifyEmail"))
 );
+app.use('/api/v1/admin', require(path.join(__dirname, 'routes', 'admin')))
 // app.use('/', require(path.join(__dirname, 'routes', 'index')))
 
 // Error Handling

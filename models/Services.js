@@ -27,7 +27,10 @@ const servieSchema = new mongoose.Schema({
         type : mongoose.Types.ObjectId,
         ref : 'User',
         required : true
-    }
+    },block : {
+        type : Boolean,
+        default : true
+      }
 
 },{
     timestamps : true

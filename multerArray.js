@@ -17,7 +17,7 @@ const upload = multer({
       );
     }
   }),
-  limits: { fileSize: 1024 * 1024 },
+  limits: { fileSize: 1024 * 1024 * 10 },
   fileFilter(req, file, cb) {
     checktype(file, cb);
   }

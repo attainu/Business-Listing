@@ -20,22 +20,19 @@ const emailVerified = require(path.join(
   "middlewares",
   "emailVerified"
 ));
-const adminVerified = require(path.join(
-  __dirname,
-  "..",
-  "middlewares",
-  "adminVerified"
-));
-
 // Importing Controller Routes
-const { Register, Login, Logout, Me, forgotPassword, verifyForgotPasswordToken, modifyPassword } = require(path.join(
-  __dirname,
-  "..",
-  "controllers",
-  "users"
-));
+const {
+  Register,
+  Login,
+  Logout,
+  Me,
+  forgotPassword,
+  verifyForgotPasswordToken,
+  modifyPassword,
+  getBusinessLists,
+  placeOrder
+} = require(path.join(__dirname, "..", "controllers", "users"));
 // Register Routes
-
 router.route("/me").get(authorized, Me);
 router.route("/register").post(emailexists, Register);
 // Login Routes
@@ -45,9 +42,13 @@ router.route("/logout").delete(authorized, Logout);
 // forgot password
 router.route("/forgot-password").post(forgotPassword);
 // verify forgot password token and create a new password
-router.route('/create-password/:id').put(verifyForgotPasswordToken)
+router.route("/create-password/:id").put(verifyForgotPasswordToken);
 // Change password
-router.route('/modify-password').put(authorized, modifyPassword)
+router.route("/modify-password").put(authorized, modifyPassword);
+// View all clients
+router.route("/view-all").get(getBusinessLists);
+// Request vendor
+router.route("/send-request/:id").post(authorized, placeOrder);
 // search for a vendor
 router.route("/client/search").get();
 // Exporting router module
