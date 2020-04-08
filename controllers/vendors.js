@@ -215,24 +215,30 @@ exports.bannerImage = async(async (req, res, next) => {
         error: `Requested user ${req.user.id} is not authorized to perform this action`,
       });
     }
-    const imagedata = await cloudinary.v2.uploader.upload(req.file.path);
-    const successdata = await BusinessList.findByIdAndUpdate(
-      req.params.id,
-      { $set: { banner: imagedata.secure_url } },
-      { new: true, runvalidators: true }
-    );
-    return res.status(200).json({ success: true, data: successdata });
+    try {
+      const imagedata = await cloudinary.v2.uploader.upload(req.file.path);
+      const successdata = await BusinessList.findByIdAndUpdate(
+        req.params.id,
+        { $set: { banner: imagedata.secure_url } },
+        { new: true, runvalidators: true }
+      );
+      return res.status(200).json({ success: true, data: successdata });
+    } catch (err) {
+      return res.status(401).json({ success: false, err });
+    }
   }
 });
 
 // Updating Image Collections
 exports.imageCollections = async(async (req, res, next) => {
   let arr = req.files;
-  // uploadArray(req, res, err => {
-  //   if (err) {
-  //     return res.status(400).json({ msg: err });
-  //   }
-  // });
+  console.log(arr)
+  // console.log(arr, req.user._id)
+  uploadArray(req, res, err => {
+    if (err) {
+      return res.status(400).json({ msg: err });
+    }
+  });
   const businesslist = await BusinessList.findById(req.params.id);
   if (!businesslist) {
     return res.status(400).json({
@@ -240,38 +246,30 @@ exports.imageCollections = async(async (req, res, next) => {
       error: `No valid resource found with requested id ${req.params.id}`,
     });
   } else {
-    if (
-      businesslist.user.toString() !== req.user.id &&
-      req.user.role !== "admin"
-    ) {
-      return res.status(403).json({
-        success: false,
-        error: `Requested user ${req.user.id} is not authorized to perform this action`,
-      });
-    }
+    // if(businesslist.user != req.user._id){
+    //   return res.status(403).json({success : false, error : `requested user with id ${req.user._id} is not authorized to perform this action.`})
+    // }
     if (businesslist.gallery.length === 6) {
       return res.status(406).json({
         success: false,
         error: `You'd reached the maximum gallery upload limit. Please delete older images to update new images`,
       });
     } else {
-      for (let elem of arr) {
-        const imagedata = await cloudinary.v2.uploader.upload(elem);
+      try {
+        let gallery = businesslist.gallery;
+        for (let elem of arr) {
+          let imagedata = await cloudinary.v2.uploader.upload(elem);
+          gallery.push(imagedata.secure_url)
+        }
         const successdata = await BusinessList.findByIdAndUpdate(
           req.params.id,
-          { $set: { banner: imagedata.secure_url } },
+          { $set: { gallery: gallery } },
           { new: true, runvalidators: true }
         );
-        return res.status(200).json({ success: true, data: successdata });
+        return res.status(200).json({ success: true, data : successdata });
+      } catch (err) {
+        return res.status(401).json({ success: false });
       }
-      const imagedata = await cloudinary.v2.uploader.upload(arr);
-      console.log(imagedata);
-      // const successdata = await BusinessList.findByIdAndUpdate(
-      //   req.params.id,
-      //   { $set: { gallery: imagedata.secure_url } },
-      //   { new: true, runvalidators: true }
-      // );
-      // return res.status(400).json({ success: true, data: successdata });
     }
   }
 });
@@ -295,31 +293,12 @@ exports.deleteGallery = async(async (req, res, next) => {
       });
     }
     let data = businessid.gallery;
-    let query = req.query;
-    let arr = query.gallery.split(",");
-    function arr_diff(a1, a2) {
-      var a = [],
-        diff = [];
-      for (var i = 0; i < a1.length; i++) {
-        a[a1[i]] = true;
-      }
-      for (var i = 0; i < a2.length; i++) {
-        if (a[a2[i]]) {
-          delete a[a2[i]];
-        } else {
-          a[a2[i]] = true;
-        }
-      }
-      for (var k in a) {
-        diff.push(k);
-      }
-      return diff;
-    }
-    let gall = arr_diff(data, arr)
-    console.log(gall)
-    let user = await BusinessList.findById(req.params.id)
+    let arr = req.query.gallery.split(",");
+    var difference = data.filter((x) => arr.indexOf(x) === -1);
+    console.log(difference);
+    let user = await BusinessList.findById(req.params.id);
     let updated = await BusinessList.findByIdAndUpdate(req.params.id, {
-      $set: { gallery: gall },
+      $set: { gallery: difference },
     });
     res.status(201).json({ success: true, data: updated });
   }

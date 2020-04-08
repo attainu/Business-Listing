@@ -1,12 +1,18 @@
 // Requiring NPM Modules
-const [express, path, fs, dotenv, mongoose, morgan, cookieParser] = [
+const [express, path, fs, dotenv, mongoose, morgan, cookieParser, sanitize, helmet, xss, rateLimit, hpp, compression] = [
   require("express"),
   require("path"),
   require("fs"),
   require("dotenv").config(),
   require("mongoose"),
   require("morgan"),
-  require('cookie-parser')
+  require('cookie-parser'),
+  require('express-mongo-sanitize'),
+  require('helmet'),
+  require('xss-clean'),
+  require('express-rate-limit'),
+  require('hpp'),
+  require('compression')
 ];
 
 // Initializing App variable
@@ -17,6 +23,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser())
+app.use(sanitize())
+app.use(helmet())
+app.use(xss())
+app.use(hpp())
+app.use(compression())
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 mins
+  max: 100
+});
+app.use(limiter);
+
 
 // Fixing cors errors problems
 app.use((req, res, next) => {

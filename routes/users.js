@@ -38,7 +38,7 @@ router.route("/register").post(emailexists, Register);
 // Login Routes
 router.route("/login").post(emailVerified, Login);
 // Logout Routes
-router.route("/logout").delete(authorized, Logout);
+router.route("/logout").post(authorized, Logout);
 // forgot password
 router.route("/forgot-password").post(forgotPassword);
 // verify forgot password token and create a new password

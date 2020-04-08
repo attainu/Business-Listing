@@ -119,11 +119,15 @@ exports.Login = async(async (req, res, next) => {
 });
 // Logout Route
 exports.Logout = async(async (req, res, next) => {
-  const user = req.user;
-  let token = await User.findOne({ token: user.token });
-  token.token = "";
-  await token.save();
-  return res.json({ message: "Logged out Successfull" });
+  res.cookie('token', 'none', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+
+  res.status(200).json({
+    success: true,
+    data: {}
+  });
 });
 // Fetch all businesses
 exports.getBusinessLists = async(async (req, res, next) => {
@@ -278,18 +282,18 @@ exports.forgotPassword = async(async (req, res, next) => {
   user.passwordToken = token;
   user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
   await user.save({ validateBeforeSave: false });
-  res.json(user);
+  // res.json(user);
   try {
     passwordReset(email, token);
     return res
       .status(200)
-      .status({
+      .json({
         success: true,
         message: "Email sent with password reset link.",
       });
   } catch (err) {
     user.passwordToken = undefined;
-    return res.status(403).status({ success: false, error: "Email sent fail" });
+    return res.status(403).json({ success: false, error: "Email sent fail" });
   }
 });
 
