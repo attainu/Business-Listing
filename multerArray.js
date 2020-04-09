@@ -17,11 +17,11 @@ const upload = multer({
       );
     }
   }),
-  limits: { fileSize: 1024 * 1024 * 10 },
+  limits: { fileSize: 1024 * 1024 },
   fileFilter(req, file, cb) {
     checktype(file, cb);
   }
-}).array("gallery", 6);
+}).single("banner");
 
 let checktype = (file, cb) => {
   // Allowed ext
@@ -34,8 +34,8 @@ let checktype = (file, cb) => {
   if (mimetype && extname) {
     return cb(null, true);
   } else {
-    cb("Error: Images Only!");
-    res.status(406).json({success : true, error : `Error Only Images are accepted.`})
+    // cb("Error: Images Only!");
+    return res.status(406).json({success : true, error : `Error Only Images are accepted.`})
   }
 };
 

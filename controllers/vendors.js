@@ -5,9 +5,9 @@ const [path, Joi, multer, cloudinary] = [
   require("multer"),
   require("cloudinary"),
 ];
-
 // Middlewares/custom files import
-const [BusinessList, User, async, uploadSingle, uploadArray, Order] = [
+const [order, BusinessList, User, async, uploadSingle, uploadArray] = [
+  require(path.join(__dirname, '..', 'models', 'Orders')),
   require(path.join(__dirname, "..", "models", "BusinessLists")),
   require(path.join(__dirname, "..", "models", "Users")),
   require(path.join(
@@ -16,8 +16,7 @@ const [BusinessList, User, async, uploadSingle, uploadArray, Order] = [
     "middlewares",
     "asyncHandler"
   ), require(path.join(__dirname, "..", "multerSingle"))),
-  require(path.join(__dirname, "..", "multerArray")),
-  require(path.join(__dirname, "..", "models", "Orders")),
+  require(path.join(__dirname, "..", "multerArray"))
 ];
 // cloudinary
 require(path.join(__dirname, "..", "cloudinary"));
@@ -38,24 +37,14 @@ exports.getBusinessListByID = async(async (req, res, next) => {
 // Get requests
 exports.getOrders = async(async (req, res, next) => {
   if (req.user.role !== "vendor")
-    return res.status(401).json({
-      success: false,
-      error: `You're not authorized to perform this task`,
-    });
-  const user = req.user._id;
-  if (!user)
     return res
-      .status(401)
-      .json({ success: false, error: `Unauthorized access detected.` });
-  const orders = await Order.find({ vendorId: user });
-  if (!orders)
-    return res
-      .status(404)
-      .json({ success: false, count: orders.length, error: `No orders.` });
-  return res
-    .status(200)
-    .json({ success: true, count: orders.length, data: orders });
+      .status(400)
+      .json({ success: false, error: `You're not authorized to this task.` });
+  const orders = await order.find({vendorId : req.user._id});
+  if(!orders) return res.status(400).json({success : false, error : `You've No Orders.`})
+  return res.status(200).json({success : true, data : orders})
 });
+// Accept orders
 exports.acceptOrders = async(async (req, res, next) => {
   const orderId = req.params.id;
   if (!orderId)
@@ -165,7 +154,6 @@ exports.createBusinessList = async(async (req, res, next) => {
     });
   }
 });
-
 // update business by id
 exports.updateBusinessListByID = async(async (req, res, next) => {
   let businesslist = await BusinessList.findById(req.params.id);
@@ -191,7 +179,6 @@ exports.updateBusinessListByID = async(async (req, res, next) => {
   });
   res.status(201).json({ success: true, data: businesslist });
 });
-
 // Updating Banner Image
 exports.bannerImage = async(async (req, res, next) => {
   uploadSingle(req, res, (err) => {
@@ -228,17 +215,13 @@ exports.bannerImage = async(async (req, res, next) => {
     }
   }
 });
-
 // Updating Image Collections
 exports.imageCollections = async(async (req, res, next) => {
-  let arr = req.files;
-  console.log(arr)
-  // console.log(arr, req.user._id)
-  uploadArray(req, res, err => {
-    if (err) {
-      return res.status(400).json({ msg: err });
-    }
-  });
+  // uploadSingle(req, res, (err) => {
+  //   if (err) {
+  //     return res.status(400).json({ msg: err });
+  //   }
+  // });
   const businesslist = await BusinessList.findById(req.params.id);
   if (!businesslist) {
     return res.status(400).json({
@@ -246,34 +229,31 @@ exports.imageCollections = async(async (req, res, next) => {
       error: `No valid resource found with requested id ${req.params.id}`,
     });
   } else {
-    // if(businesslist.user != req.user._id){
-    //   return res.status(403).json({success : false, error : `requested user with id ${req.user._id} is not authorized to perform this action.`})
-    // }
+    if (
+      businesslist.user.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({
+        success: false,
+        error: `Requested user ${req.user.id} is not authorized to perform this action`,
+      });
+    }
     if (businesslist.gallery.length === 6) {
       return res.status(406).json({
         success: false,
-        error: `You'd reached the maximum gallery upload limit. Please delete older images to update new images`,
+        error: `You'd reached the maximum galllery limit.`,
       });
-    } else {
-      try {
-        let gallery = businesslist.gallery;
-        for (let elem of arr) {
-          let imagedata = await cloudinary.v2.uploader.upload(elem);
-          gallery.push(imagedata.secure_url)
-        }
-        const successdata = await BusinessList.findByIdAndUpdate(
-          req.params.id,
-          { $set: { gallery: gallery } },
-          { new: true, runvalidators: true }
-        );
-        return res.status(200).json({ success: true, data : successdata });
-      } catch (err) {
-        return res.status(401).json({ success: false });
-      }
+    }
+    try {
+      const imagedata = await cloudinary.v2.uploader.upload(req.file.path);
+      businesslist.gallery.push(imagedata.secure_url);
+      await businesslist.save();
+      return res.status(200).json({ success: true, data: successdata });
+    } catch (err) {
+      return res.status(401).json({ success: false, error: err });
     }
   }
 });
-
 // Delete gallery images
 exports.deleteGallery = async(async (req, res, next) => {
   const businessid = await BusinessList.findById(req.params.id);
@@ -303,7 +283,17 @@ exports.deleteGallery = async(async (req, res, next) => {
     res.status(201).json({ success: true, data: updated });
   }
 });
-
+// Recommendations
+exports.getRecommendations = async(async (req, res, next) => {
+  let [vendorId, arr] = [req.params.id, []];
+  let getCategory = await BusinessList.findById(vendorId);
+  let vendors = await BusinessList.find({
+    category: getCategory.category,
+  }).sort({ avgRating: -1 });
+  return res
+    .status(200)
+    .json({ success: false, count: vendors.length, data: vendors.slice(0, 5) });
+});
 // Delete business by id
 exports.deleteBusinessListByID = async(async (req, res, next) => {
   const businesslist = await BusinessList.findById(req.params.id);

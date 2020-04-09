@@ -30,7 +30,8 @@ const {
   verifyForgotPasswordToken,
   modifyPassword,
   getBusinessLists,
-  placeOrder
+  placeOrder,
+  postRatings
 } = require(path.join(__dirname, "..", "controllers", "users"));
 // Register Routes
 router.route("/me").get(authorized, Me);
@@ -51,5 +52,7 @@ router.route("/view-all").get(getBusinessLists);
 router.route("/send-request/:id").post(authorized, placeOrder);
 // search for a vendor
 router.route("/client/search").get();
+// post a rating
+router.route('/ratings/:id').post(authorized, postRatings)
 // Exporting router module
 module.exports = router;

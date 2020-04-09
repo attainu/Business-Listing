@@ -119,14 +119,14 @@ exports.Login = async(async (req, res, next) => {
 });
 // Logout Route
 exports.Logout = async(async (req, res, next) => {
-  res.cookie('token', 'none', {
+  res.cookie("token", "none", {
     expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
+    httpOnly: true,
   });
 
   res.status(200).json({
     success: true,
-    data: {}
+    data: {},
   });
 });
 // Fetch all businesses
@@ -195,8 +195,8 @@ exports.getBusinessLists = async(async (req, res, next) => {
 });
 // Request vendor
 exports.placeOrder = async(async (req, res, next) => {
-  const user = req.user.id
-  const vendor = req.params.id
+  const user = req.user.id;
+  const vendor = req.params.id;
   if (req.user.role !== "user") {
     return res
       .status(401)
@@ -204,21 +204,17 @@ exports.placeOrder = async(async (req, res, next) => {
   }
   const vendors = await Businesslist.findById(vendor);
   if (!vendors) {
-    return res
-      .status(404)
-      .json({
-        success: false,
-        error: `No valid resource found with id ${vendor}`,
-      });
+    return res.status(404).json({
+      success: false,
+      error: `No valid resource found with id ${vendor}`,
+    });
   }
   const { date, event, description, budget, location } = req.body;
   if (budget < vendor.price) {
-    return res
-      .status(406)
-      .json({
-        success: false,
-        error: `Budget can't less than ${vendor.price}`,
-      });
+    return res.status(406).json({
+      success: false,
+      error: `Budget can't less than ${vendor.price}`,
+    });
   } else {
     const schema = Joi.object({
       date: Joi.string().required(),
@@ -244,16 +240,14 @@ exports.placeOrder = async(async (req, res, next) => {
         budget,
         location,
         vendorId: req.params.id,
-        user
+        user,
       });
       await order.save();
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Order sent successfully. vendor will get back to you asap.",
-          data: order,
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Order sent successfully. vendor will get back to you asap.",
+        data: order,
+      });
     }
   }
 });
@@ -285,12 +279,10 @@ exports.forgotPassword = async(async (req, res, next) => {
   // res.json(user);
   try {
     passwordReset(email, token);
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "Email sent with password reset link.",
-      });
+    return res.status(200).json({
+      success: true,
+      message: "Email sent with password reset link.",
+    });
   } catch (err) {
     user.passwordToken = undefined;
     return res.status(403).json({ success: false, error: "Email sent fail" });
@@ -355,7 +347,10 @@ exports.modifyPassword = async(async (req, res, next) => {
     newConfirmPassword: newConfirmPassword,
   });
   if (error)
-    return res.status(400).json({ success: false, error: `New password and Confirm password doesn't match` });
+    return res.status(400).json({
+      success: false,
+      error: `New password and Confirm password doesn't match`,
+    });
   const hashed = await hash(newPassword, 10);
   await User.findByIdAndUpdate(
     req.user.id,
@@ -365,6 +360,52 @@ exports.modifyPassword = async(async (req, res, next) => {
   res
     .status(200)
     .json({ success: false, message: `Password changed successfully.` });
+});
+// Ratings
+exports.postRatings = async(async (req, res, next) => {
+  let [user, vendorid] = [req.user, req.params.id];
+  if (user.role !== "user")
+    return res
+      .status(406)
+      .json({ success: false, error: `You're not authorized to post rating` });
+  if (!user)
+    return res
+      .status(406)
+      .json({
+        success: false,
+        error: `You're not authorized to perform this action`,
+      });
+  if (!vendorid)
+    return res
+      .status(406)
+      .json({
+        success: false,
+        error: `No valid resource found with requested id ${vendorid}`,
+      });
+  const vendor = await Businesslist.findById(vendorid);
+  if (!vendor)
+    return res
+      .status(406)
+      .json({
+        success: false,
+        error: `No valid resource found with requested id ${vendorid} in our records.`,
+      });
+  const rating = req.body.rating;
+  if (!rating)
+    return res
+      .status(406)
+      .json({ success: false, error: `rating should be in between 1-5` });
+  vendor.rating.push(rating);
+  await vendor.save();
+  let [ratingarr, total] = [vendor.rating, 0]
+for(let rating of ratingarr){
+  total += rating
+}
+const avgrating = total/ratingarr.length
+  await Businesslist.findByIdAndUpdate(req.params.id, {$set: {avgRating : avgrating}}, {new : true, runvalidators : true})
+  return res
+    .status(200)
+    .json({ success: true, message: "Thank you for your valuable feedback." });
 });
 // Storing jwt token in cookie
 const storecookie = (user, status, res) => {

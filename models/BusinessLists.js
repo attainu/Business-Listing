@@ -113,6 +113,10 @@ const businessSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    avgRating : {
+      type : String,
+      default : 0
+    },
     user: {
       type: mongoose.Types.ObjectId,
       ref: "User",

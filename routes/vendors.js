@@ -24,6 +24,7 @@ const {
   imageCollections,
   deleteGallery,
   acceptOrders,
+  getRecommendations
 } = require(path.join(__dirname, "..", "controllers", "vendors"));
 
 // routes Middlewares
@@ -52,6 +53,8 @@ router
   .route("/image_collections/:id")
   .put(authorized, roleauthor("admin", "vendor"), uploadArray, imageCollections)
   .delete(authorized, roleauthor("admin", "vendor"), deleteGallery);
+// Get recommendations
+router.route('/recommendations/:id').get(getRecommendations)
 
 // router.route("image_collections/:id").put(uploadArray, imageCollections);
 
