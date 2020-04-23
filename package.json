@@ -1,0 +1,54 @@
+{
+  "name": "Business-Listing",
+  "version": "1.0.0",
+  "description": "Project by Ganesh and Shubham",
+  "main": "index.js",
+  "scripts": {
+    "test" : "jest",
+    "start": "NODE_ENV=production node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/attainu/Business-Listing.git"
+  },
+  "engines": {
+    "node": "12.6.1"
+  },
+  "keywords": [],
+  "author": "Ganesh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/attainu/Business-Listing/issues"
+  },
+  "homepage": "https://github.com/attainu/Business-Listing#readme",
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.20.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-mongo-sanitize": "^2.0.0",
+    "express-rate-limit": "^5.1.1",
+    "helmet": "^3.22.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.6",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.2",
+    "node-geocoder": "^3.26.0",
+    "nodemailer": "^6.4.6",
+    "randomstring": "^1.1.5",
+    "slugify": "^1.4.0",
+    "string-similarity": "^4.0.1",
+    "uniqid": "^5.2.0",
+    "uuid": "^7.0.2",
+    "xss-clean": "^0.1.1"
+  },
+  "devDependencies": {
+    "jest": "^25.3.0",
+    "nodemon": "^2.0.2"
+  }
+}
